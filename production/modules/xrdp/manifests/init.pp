@@ -1,4 +1,6 @@
-class xrdp {
+class xrdp (
+	$manage_firewall = true,
+) {
         file { '/etc/yum.repos.d/xrdp.repo':
                 ensure => "file",
                 owner  => "root",
@@ -18,7 +20,17 @@ gpgcheck=0
         }
         service { 'xrdp':
                 ensure => running,
-                require => Package['xrdp']
+                require => Package['xrdp'],
         }
-	firewall
+	service { 'xrdp-sesman':
+		ensure => running,
+		require => Package['xrdp'],
+	}
+	#if ($manage_firewall) {
+	#	firewall { 'Accept RDP':
+	#		proto => 'tcp',
+	#		port => 3389,
+	#		action => 'accept',
+	#	}
+	#}
 }
